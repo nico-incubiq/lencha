@@ -1,0 +1,69 @@
+{{template "header" .}}
+
+<div class="jumbotron">
+    <div class="container">
+        <h1>Lencha</h1>
+        <p>Programming challenges.</p>
+    </div>
+</div>
+
+<div class="container section">
+    <div class="row">
+        <div class="col-sm-4">
+            <div class="feature">
+                <h3>Challenges</h3>
+                <p>From simple algorithms application to complex problems. We try to be as diverse
+                as possible. I will try to put a new problem every week.</p>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="feature">
+                <h3>Rest API</h3>
+                <p>Challenges are solved through an HTTP rest api. Create an account, get an access
+                token, and you are ready to go. For additional help scroll a bit more.</p>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="feature">
+                <h3>Contribute</h3>
+                <p>The website code is open source. If you have a challenge idea or any suggestion,
+                head to our repositery. I would love people to contribute, and build a community
+                around the website.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="container section">
+    <h2 class="title">Getting started</h2>
+    <h4 class="subtitle"><a class="selected" href="#">Javascript</a> <a href="#">Ruby</a> <a href="#">Go</a></h4>
+    <p>Let's solve the first problem together. Your goal is to get a string from our server, and
+    send its reversed version back.<br>
+    Get your api key from your profile and you are ready to code (You need to be registered)</p>
+            <pre class="code-example">
+<code class="javascript">var request = require('request');
+
+request('http://www.google.com', function (error, response, body) {
+  if (!error && response.statusCode == 200) {
+    console.log(body) // Show the HTML for the Google homepage.
+  }
+});</code>
+            </pre>
+</div>
+
+<hr class="footer-seperation">
+
+<div class="container container-footer">
+    <iframe class="github-frame" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=star&count=true"
+            frameborder="0" scrolling="0" width="100px" height="20px"></iframe>
+    <p class="text-center">This website was built by a french guy lost in London, purely for fun. Hope you like it !</p>
+</div>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/tomorrow.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+
+{{template "footer" .}}
+

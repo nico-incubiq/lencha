@@ -1,0 +1,28 @@
+{
+  "development": {
+    "host": "localhost:8080",
+    "db": {
+      "driver":   "postgres",
+      "user":     "cl3m",
+      "name":   "lencha"
+    },
+    "redis": {
+        "network": "tcp",
+        "host": "localhost:6379",
+        "maxconnections": 10
+    }
+  },
+  "production": {
+    "host": "localhost:80",
+    "db": {
+      "driver":   "postgres",
+      "user":     "lencha",
+      "name":   "lencha"
+    },
+    "redis": {
+        "network": "tcp",
+        "host": "localhost:6379",
+        "maxconnections": 10
+    }
+  }
+}

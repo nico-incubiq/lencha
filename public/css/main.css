@@ -1,0 +1,514 @@
+/*! HTML5 Boilerplate v5.0 | MIT License | http://h5bp.com/ */
+
+html {
+    color: #222;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+::-moz-selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+::selection {
+    background: #b3d4fc;
+    text-shadow: none;
+}
+
+hr {
+    display: block;
+    height: 1px;
+    border: 0;
+    border-top: 1px solid #ccc;
+    margin: 1em 0;
+    padding: 0;
+}
+
+audio,
+canvas,
+iframe,
+img,
+svg,
+video {
+    vertical-align: middle;
+}
+
+fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+}
+
+textarea {
+    resize: vertical;
+}
+
+.browserupgrade {
+    margin: 0.2em 0;
+    background: #ccc;
+    color: #000;
+    padding: 0.2em 0;
+}
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+body {
+    font-weight: 200;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 {
+    font-weight: 300;
+}
+
+hr {
+    margin: 3em 0;
+}
+
+/*========HEADER========*/
+
+.nav {
+    padding: 0 20px;
+    background-color: white;
+    left: 0;
+    border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.nav-title {
+    float: left;
+    line-height: 34px;
+    padding: 10px 10px 10px 0;
+    margin-right: 10px;
+    color: rgb(59, 81, 153);
+    font-size: 26px;
+}
+
+.nav-title > a {
+    color: inherit;
+}
+
+.nav-title > a:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.nav-link-list {
+    display: inline-block;
+    margin: 0;
+    padding-left: 0px;
+    font-size: 18px;
+    list-style: none;
+}
+
+.nav-link {
+    display: inline-block;
+}
+
+.nav-link a:hover {
+    background-color: #F7F7F7;
+}
+
+.nav-link a {
+    display: inline-block;
+    padding: 15px 10px;
+    text-decoration: none;
+    color: #337ab7;
+}
+
+.nav-left-container {
+  display: inline-block;
+}
+
+.nav-right-container {
+  float: right;
+}
+
+/*========FOOTER========*/
+
+.footer {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    border-top: 1px solid rgb(216, 216, 216);}
+}
+
+/*========CONTENT========*/
+
+.container-offset {
+    margin-top: 30px;
+}
+
+.page-title-jumbotron {
+    background-color: white;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.page-title-jumbotron h1 {
+    font-weight: 100;
+    font-size: 48px;
+    padding: 10px 0;
+    margin-top: 0;
+    margin-bottom: 0px;
+}
+
+/*========HOME PAGE========*/
+
+.jumbotron {
+    background-color: white;
+    margin-bottom: 3em;
+    padding-top: 180px;
+    padding-bottom: 180px;
+    border-bottom: 1px solid rgb(216, 216, 216);
+    text-align: center;
+}
+
+.jumbotron h1 {
+    font-weight: 100;
+    font-size: 68px;
+    margin-bottom: 0px;
+}
+
+.jumbotron p {
+    font-weight: 300;
+}
+
+.section .title {
+    text-align: center;
+    margin: 0;
+}
+
+.section .subtitle {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.subtitle a {
+    color: black;
+    margin-right: 10px
+}
+
+.subtitle a:hover {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+.subtitle a.selected {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+.section p {
+    font-size: 16px;
+}
+
+.feature {
+    margin-top: 25px;
+}
+
+.feature h3 {
+    font-weight: 300;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.section p {
+    line-height: 1.5;
+    color: #555;
+    text-align: center
+}
+
+.code-example {
+    border: 1px solid #CCCCCC;
+    padding: 10px;
+    max-width: 700px;
+    margin: auto;
+    margin-top: 25px;
+}
+
+.footer-seperation {
+    margin-bottom: 15px;
+}
+
+.container-footer {
+    margin-bottom: 10px
+}
+
+.github-frame {
+    display: block;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+/*========PROFILE========*/
+
+.profile .content {
+    padding: 20px;
+}
+
+.profile .content-border {
+    border-bottom: 1px solid #D8D8D8;
+}
+
+.profile .username{
+    font-size: 24px;
+}
+
+.profile .activate-status {
+    line-height: 32px
+}
+
+.profile-row {
+    display: table;
+    font-weight: 400;
+    width: 100%;
+}
+
+.profile-row .heading {
+    width: 25%;
+}
+
+.profile-row span {
+    display: table-cell;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
+    border-collapse: collapse;
+    width: 75%;
+}
+
+.profile-challenge-list .content {
+    padding: 10px;
+    text-align: center;
+}
+
+/*========CHALLENGES========*/
+
+.card {
+    overflow: hidden;
+    margin-top: 25px;
+    background: #FFF;
+    border: 1px solid #D8D8D8;
+    color: #272727;
+}
+
+.challenge .content {
+    padding: 20px;
+    font-weight: 300;
+    border-radius: 0 0 2px 2px;
+    height: 140px;
+}
+
+.challenge .title {
+    line-height: 48px;
+    font-size: 24px;
+    font-weight: 300;
+}
+
+.challenge .action {
+    border-top: 1px solid rgba(160, 160, 160, 0.2);
+    padding: 20px;
+    text-align: right;
+}
+
+.challenge a {
+    margin-right: 20px;
+    -webkit-transition: color 0.3s ease;
+    transition: color 0.3s ease;
+    text-transform: uppercase;
+    text-decoration: none;
+}
+
+/*========LOGIN========*/
+
+.form-signin {
+    margin: auto;
+    padding: 20px 20px 35px;
+}
+
+.form-signin h2 {
+    text-align: center;
+    font-size: 20px;
+    padding-bottom: 15px;
+    margin-top: 0px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgb(216, 216, 216);
+}
+
+.form-signin input {
+    margin-bottom: 10px;
+    border-radius: 0px;
+}
+
+.btn-signin {
+    border-radius: 0;
+    margin-top: 20px;
+}
+
+.register-checkbox {
+    font-size: 12px;
+}
+
+.register-checkbox input {
+    top: -1px;
+}
+
+/*========ALERTS========*/
+
+.alert-container {
+    padding: 0 10px;
+    padding-bottom: 0;
+}
+
+.alert {
+    padding: 10px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.alert-danger {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+}
+
+.alert-success {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+}
+
+
+/* ==========================================================================
+   Media Queries
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+
+}
+
+/* ==========================================================================
+   Helper classes
+   ========================================================================== */
+
+.hidden {
+    display: none !important;
+    visibility: hidden;
+}
+
+.visuallyhidden {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
+}
+
+.visuallyhidden.focusable:active,
+.visuallyhidden.focusable:focus {
+    clip: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    position: static;
+    width: auto;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.clearfix:before,
+.clearfix:after {
+    content: " ";
+    display: table;
+}
+
+.clearfix:after {
+    clear: both;
+}
+
+.clearfix {
+    *zoom: 1;
+}
+
+/* ==========================================================================
+   Print styles
+   ========================================================================== */
+
+@media print {
+    *,
+    *:before,
+    *:after {
+        background: transparent !important;
+        color: #000 !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    a[href^="#"]:after,
+    a[href^="javascript:"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}

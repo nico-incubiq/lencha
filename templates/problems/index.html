@@ -1,0 +1,23 @@
+{{template "header" .}}
+<div class="page-title-jumbotron">
+    <div class="container">
+        <h1 style="display: inline-block; margin-right: 25px">Challenges</h1>
+        <div class="" style="display: inline-block;">
+            <div class="checkbox" style="margin-top: 0;">
+                <label>
+                    <input type="checkbox" checked>Show solved
+                </label>
+            </div>
+            <input id="js-filter-challenges-input" type="text" class="form-control" placeholder="Search" style="width: 350px; border-radius: 0px; height: 30px;">
+        </div>
+    </div>
+</div>
+
+<div id="js-content"></div>
+
+<script type="text/javascript">
+    var challenges = {{.Problems}};
+</script>
+<script type="text/jsx" src="/js/challenges.jsx"></script>
+
+{{template "footer" .}}

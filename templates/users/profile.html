@@ -1,0 +1,57 @@
+{{template "header" .}}
+<div class="page-title-jumbotron">
+    <div class="container">
+        <h1>Profile</h1>
+    </div>
+</div>
+<div class="container container-offset">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="profile card">
+                <div class="content content-border">
+                    <div class="title">
+                        <span class="username">{{.User.Username}}</span>
+                        {{if .User.Activated}}
+                        <span class="activate-status ion-checkmark text-success pull-right"> Activated</span>
+                        {{else}}
+                        <span class="activate-status ion-alert text-warning pull-right"> Not Activated !</span>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="profile-row">
+                        <span class="heading">Api Key</span>
+                        <span>{{.User.ApiKey}}</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="heading">Problems Solved</span>
+                        <span>{{.User.ProblemsSolved}}</span>
+                    </div>
+                    <div class="profile-row">
+                        <span class="heading">Account created</span>
+                        <span>{{.User.CreatedAt}}</span>
+                    </div>
+                </div>
+            </div>
+            <!-- <h4>Api key: {{.User.ApiKey}}</h4> -->
+            <!-- <h4>Problems Solved: {{.User.ProblemsSolved}}</h4> -->
+        </div>
+    </div>
+
+    {{range sliceBy12 .ProblemsSolved}}
+    <div class="row challenge-row">
+        {{range .}}
+        <div class="col-sm-2">
+            <div class="profile-challenge-list card">
+                <div class="content">
+                    <span class="ion-checkmark text-success"></span> {{.Title}}
+                </div>
+            </div>
+        </div>
+        {{end}}
+    </div>
+    {{end}}
+
+</div>
+
+{{template "footer" .}}
