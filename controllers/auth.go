@@ -1,13 +1,14 @@
 package controllers
 
 import (
-	"clem/lencha/middlewares"
-	"clem/lencha/models"
-	"clem/lencha/utils"
 	"crypto/rand"
 	"fmt"
 	"io"
 	"net/http"
+
+	"github.com/claisne/lencha/middlewares"
+	"github.com/claisne/lencha/models"
+	"github.com/claisne/lencha/utils"
 
 	"github.com/lib/pq"
 

@@ -1,9 +1,9 @@
 package models
 
 import (
-	"clem/lencha/config"
-	"fmt"
 	"time"
+
+	"github.com/claisne/lencha/config"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
@@ -22,7 +22,6 @@ type Response struct {
 
 func ConnectDb() {
 	var err error
-	fmt.Println("user=" + config.Conf.Db.User + " dbname=" + config.Conf.Db.Name + " sslmode=disable")
 	db, err = sqlx.Connect("postgres", "user="+config.Conf.Db.User+" dbname="+config.Conf.Db.Name+" sslmode=disable")
 	if err != nil {
 		log.WithFields(log.Fields{

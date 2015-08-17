@@ -1,11 +1,12 @@
 package main
 
 import (
-	"clem/lencha/config"
-	"clem/lencha/controllers"
-	"clem/lencha/middlewares"
-	"clem/lencha/problems"
 	"net/http"
+
+	"github.com/claisne/lencha/config"
+	"github.com/claisne/lencha/controllers"
+	"github.com/claisne/lencha/middlewares"
+	"github.com/claisne/lencha/problems"
 
 	"github.com/gorilla/mux"
 )

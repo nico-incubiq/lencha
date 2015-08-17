@@ -2,11 +2,14 @@ package problems
 
 import (
 	"bytes"
-	"clem/lencha/models"
 	"encoding/gob"
 	"encoding/json"
+	"math"
 	"net/http"
+	"strconv"
 	"time"
+
+	"github.com/claisne/lencha/models"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/garyburd/redigo/redis"
@@ -57,7 +60,7 @@ func (problem Problem) GetState(user models.User) (*ProblemState, error) {
 	redisC := models.RedisPool.Get()
 	defer redisC.Close()
 
-	stateBytes, err := redis.Bytes(redisC.Do("GET", problem.Name+":"+string(user.Id)))
+	stateBytes, err := redis.Bytes(redisC.Do("GET", problem.GetKeyForUser(user)))
 	if err == redis.ErrNil {
 		return &ProblemState{Status: StatusStarting, StartedAt: time.Now(), EndingAt: time.Now().Add(problem.SolvingTime)}, nil
 	}
@@ -89,15 +92,25 @@ func (problem Problem) SetState(user models.User, state *ProblemState) error {
 		return err
 	}
 
-	_, err = redisC.Do("SET", problem.Name+":"+string(user.Id), mCache.Bytes())
+	err = redisC.Send("SET", problem.GetKeyForUser(user), mCache.Bytes())
+	_, err = redisC.Do("EXPIRE", problem.GetKeyForUser(user), problem.GetExpirationForKey(state))
 	return err
+}
+
+func (problem Problem) GetKeyForUser(user models.User) string {
+	return problem.Name + ":" + strconv.Itoa(user.Id)
+}
+
+func (problem Problem) GetExpirationForKey(state *ProblemState) int {
+	expirationTime := state.StartedAt.Add(problem.DurationBeforeRetry).Sub(time.Now()).Seconds()
+	return int(math.Ceil(expirationTime))
 }
 
 func (problem Problem) DeleteState(user models.User) error {
 	redisC := models.RedisPool.Get()
 	defer redisC.Close()
 
-	_, err := redisC.Do("DEL", problem.Name+":"+string(user.Id))
+	_, err := redisC.Do("DEL", problem.GetKeyForUser(user))
 	return err
 }
 
@@ -119,10 +132,6 @@ func HandlerFromStateHandler(problem Problem) http.Handler {
 		var message interface{}
 		if state.Status == StatusStarting {
 			message, err = problem.StartingHandler(state)
-			go func(user models.User, problem Problem) {
-				time.Sleep(problem.DurationBeforeRetry)
-				problem.DeleteState(user)
-			}(user, problem)
 		} else if state.Status == StatusInProgress {
 			if state.EndingAt.Before(time.Now()) {
 				state.Status = StatusLate
@@ -134,14 +143,15 @@ func HandlerFromStateHandler(problem Problem) http.Handler {
 			}
 		}
 
-		// Send message if problem is over
-		switch state.Status {
-		case StatusSucess:
-			message = StatusSuccessMessage
-		case StatusFailed:
-			message = StatusFailedMessage
-		case StatusLate:
-			message = StatusLateMessage
+		if message == nil {
+			switch state.Status {
+			case StatusSucess:
+				message = StatusSuccessMessage
+			case StatusFailed:
+				message = StatusFailedMessage
+			case StatusLate:
+				message = StatusLateMessage
+			}
 		}
 
 		err = problem.SetState(user, state)

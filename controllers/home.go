@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"clem/lencha/middlewares"
 	"html/template"
 	"net/http"
+
+	"github.com/claisne/lencha/middlewares"
 )
 
 var homeTemplates *template.Template

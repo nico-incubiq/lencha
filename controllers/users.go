@@ -1,9 +1,10 @@
 package controllers
 
 import (
-	"clem/lencha/models"
 	"html/template"
 	"net/http"
+
+	"github.com/claisne/lencha/models"
 
 	log "github.com/Sirupsen/logrus"
 	ctx "github.com/gorilla/context"

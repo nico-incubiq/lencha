@@ -1,8 +1,9 @@
 package middlewares
 
 import (
-	"clem/lencha/models"
 	"net/http"
+
+	"github.com/claisne/lencha/models"
 
 	ctx "github.com/gorilla/context"
 	"github.com/gorilla/sessions"

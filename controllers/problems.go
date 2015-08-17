@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"clem/lencha/middlewares"
-	"clem/lencha/models"
 	"html/template"
 	"net/http"
+
+	"github.com/claisne/lencha/middlewares"
+	"github.com/claisne/lencha/models"
 
 	log "github.com/Sirupsen/logrus"
 )
