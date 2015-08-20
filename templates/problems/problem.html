@@ -1,0 +1,21 @@
+{{template "header" .}}
+<div class="page-title-jumbotron">
+    <div class="container">
+        <h1 style="display: inline-block; margin-right: 25px">{{.Problem.Name}}</h1>
+        <div class="" style="display: inline-block;">
+            <div>Url: <a href="/api/problems/{{.Problem.ApiUrl}}">api/problems/{{.Problem.ApiUrl}}</a></div>
+            <div>Solved By: {{.Problem.SolvedTotal}}</div>
+        </div>
+    </div>
+</div>
+
+<div class="container container-offset">
+    <div class="challenge-description card">
+        <div class="content">{{.DescriptionHTML}}</div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.7/styles/tomorrow.min.css">
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min.css">
+
+{{template "footer" .}}

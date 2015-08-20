@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"github.com/lib/pq"
 )
 
 type User struct {
@@ -50,9 +52,42 @@ func CreateUser(user *User) error {
 	return err
 }
 
-func (u User) GetSolvedProblems() ([]Problem, error) {
+func GetSolvedProblemsIdById(id int) ([]int, error) {
+	var problemsId []int
+	err := db.Select(&problemsId, "SELECT problem_id FROM problems_solved WHERE user_id = $1", id)
+
+	return problemsId, err
+}
+
+func (user User) GetSolvedProblems() ([]Problem, error) {
 	problems := []Problem{}
-	err := db.Select(&problems, "SELECT pb.* FROM problemssolved solved_pb JOIN problems pb ON (pb.id = solved_pb.id) WHERE solved_pb.user_id=$1;", u.Id)
+	err := db.Select(&problems, "SELECT pb.* FROM problems_solved solved_pb JOIN problems pb ON (pb.id = solved_pb.problem_id) WHERE solved_pb.user_id=$1;", user.Id)
 
 	return problems, err
+}
+
+func (user User) SaveSuccessProblem(problemId int) error {
+	_, err := db.Exec(`INSERT INTO problems_solved (user_id, problem_id) VALUES ($1, $2)`, user.Id, problemId)
+	if err, ok := err.(*pq.Error); ok {
+		// Already solved
+		if err.Code.Class() == "23" {
+			return nil
+		} else {
+			return err
+		}
+	}
+
+	// Update Profile and problem stats
+	_, err = db.Exec(`UPDATE users SET problems_solved = problems_solved + 1 WHERE id = $1`, user.Id)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(`UPDATE problems SET solved_total = solved_total + 1 WHERE id = $1`, problemId)
+	return err
+}
+
+func (user User) SetActivated() error {
+	_, err := db.Exec(`UPDATE users SET activated = true WHERE id = $1`, user.Id)
+	return err
 }

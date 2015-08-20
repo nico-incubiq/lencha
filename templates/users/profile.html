@@ -29,7 +29,7 @@
                     </div>
                     <div class="profile-row">
                         <span class="heading">Account created</span>
-                        <span>{{.User.CreatedAt}}</span>
+                        <span>{{.User.CreatedAt.Format "January 02 2006"}}</span>
                     </div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
         <div class="col-sm-2">
             <div class="profile-challenge-list card">
                 <div class="content">
-                    <span class="ion-checkmark text-success"></span> {{.Title}}
+                    <span class="ion-checkmark text-success"></span> {{.Name}}
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@ import "time"
 
 type Problem struct {
 	Id               int       `json:"id"`
-	Title            string    `json:"title"`
+	Name             string    `json:"name"`
 	SmallDescription string    `json:"smallDescription" db:"small_description"`
 	Description      string    `json:"description"`
 	ApiUrl           string    `json:"apiUrl" db:"api_url"`
@@ -17,4 +17,11 @@ func GetAllProblems() ([]Problem, error) {
 	err := db.Select(&problems, "SELECT * FROM problems")
 
 	return problems, err
+}
+
+func GetProblemByName(name string) (Problem, error) {
+	problem := Problem{}
+	err := db.Get(&problem, "SELECT * FROM problems WHERE api_url=$1", name)
+
+	return problem, err
 }

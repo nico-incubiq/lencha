@@ -69,6 +69,15 @@ hr {
     margin: 3em 0;
 }
 
+a:hover {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+p {
+    font-size: 16px;
+}
+
 /*========HEADER========*/
 
 .nav {
@@ -161,6 +170,7 @@ hr {
 /*========HOME PAGE========*/
 
 .jumbotron {
+    position: relative;
     background-color: white;
     margin-bottom: 3em;
     padding-top: 180px;
@@ -177,6 +187,13 @@ hr {
 
 .jumbotron p {
     font-weight: 300;
+}
+
+.jumbotron-svg-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 
 .section .title {
@@ -199,7 +216,7 @@ hr {
     text-decoration: none;
 }
 
-.subtitle a.selected {
+a.selected {
     color: #337ab7;
     text-decoration: none;
 }
@@ -246,9 +263,17 @@ hr {
     margin-bottom: 10px;
 }
 
+/*========SVG========*/
+
+svg .sort-bar {
+    stroke: rgb(216, 216, 216);
+    stroke-width: 1px;
+    shape-rendering: crispEdges;
+}
+
 /*========PROFILE========*/
 
-.profile .content {
+.card .content {
     padding: 20px;
 }
 
@@ -316,12 +341,37 @@ hr {
     text-align: right;
 }
 
-.challenge a {
-    margin-right: 20px;
+.challenge p {
+    font-size: 14px;
+}
+
+.action a {
+    margin-left: 20px;
     -webkit-transition: color 0.3s ease;
     transition: color 0.3s ease;
     text-transform: uppercase;
     text-decoration: none;
+}
+
+
+.challenge .solved {
+    font-size: 16px;
+}
+
+/*========CHALLENGE-DESCRIPTION========*/
+
+.content > *:first-child {
+    margin-top:0;
+}
+
+.challenge-description h2 {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #B9B9B9;
+}
+
+.challenge-description h4 {
+    font-weight: 400;
 }
 
 /*========LOGIN========*/

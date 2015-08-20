@@ -1,6 +1,7 @@
 package problems
 
 import (
+	"encoding/gob"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -9,10 +10,10 @@ import (
 )
 
 var Reverse = Problem{
+	Id:                  1,
 	Name:                "reverse",
-	SolvingTime:         3 * time.Second,
-	DurationBeforeRetry: 5 * time.Second,
-	Data:                ReverseData{},
+	SolvingTime:         30 * time.Second,
+	DurationBeforeRetry: 30 * time.Second,
 	InProgressHandler:   ReverseInProgressHandler,
 	StartingHandler:     ReverseStartingHandler,
 }
@@ -23,6 +24,10 @@ type ReverseData struct {
 
 type ReverseClientAnswer struct {
 	Reversed string `json:"reversed"`
+}
+
+func init() {
+	gob.Register(ReverseData{})
 }
 
 func ReverseStartingHandler(state *ProblemState) (interface{}, error) {
@@ -41,10 +46,11 @@ func ReverseInProgressHandler(r *http.Request, state *ProblemState) (interface{}
 	}
 
 	reverseData := state.Data.(ReverseData)
-	if answer.Reversed != utils.Reverse(reverseData.Str) {
-		state.Status = StatusFailed
+	if answer.Reversed == utils.Reverse(reverseData.Str) {
+		state.Status = StatusSuccess
 	} else {
-		state.Status = StatusSucess
+		state.Status = StatusFailed
 	}
+
 	return nil, nil
 }

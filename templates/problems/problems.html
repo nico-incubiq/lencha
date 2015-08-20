@@ -5,7 +5,7 @@
         <div class="" style="display: inline-block;">
             <div class="checkbox" style="margin-top: 0;">
                 <label>
-                    <input type="checkbox" checked>Show solved
+                    <input id="js-filter-solved-checkbox" type="checkbox" checked>Show solved
                 </label>
             </div>
             <input id="js-filter-challenges-input" type="text" class="form-control" placeholder="Search" style="width: 350px; border-radius: 0px; height: 30px;">
@@ -17,7 +17,23 @@
 
 <script type="text/javascript">
     var challenges = {{.Problems}};
+    var challengesSolvedIds = {{.ProblemsSolvedIds}};
+
+    for(var j = 0; j < challenges.length; j++) {
+        challenges[j].solved = false;
+        for(var i = 0; i < challengesSolvedIds.length; i++) {
+            if(challenges[j].id == challengesSolvedIds[i]) {
+                challenges[j].solved = true;
+                break;
+            }
+        }
+    }
+
+    challenges = challenges.sort(function(a, b) { return a.id - b.id; });
 </script>
-<script type="text/jsx" src="/js/challenges.jsx"></script>
+
+{{template "commonJs"}}
+
+<script src="/js/challenges.js"></script>
 
 {{template "footer" .}}

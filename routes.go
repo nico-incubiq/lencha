@@ -3,7 +3,6 @@ package main
 import (
 	"net/http"
 
-	"github.com/claisne/lencha/config"
 	"github.com/claisne/lencha/controllers"
 	"github.com/claisne/lencha/middlewares"
 	"github.com/claisne/lencha/problems"
@@ -16,9 +15,7 @@ func GenerateHandlers() http.Handler {
 
 	routesHandlers := CreateRoutes()
 
-	if !config.Conf.Production {
-		handlers = middlewares.LoggingRequest(routesHandlers)
-	}
+	handlers = middlewares.LoggingRequest(routesHandlers)
 
 	return handlers
 }
@@ -26,42 +23,31 @@ func GenerateHandlers() http.Handler {
 func CreateRoutes() http.Handler {
 	// Router definition
 	router := mux.NewRouter()
+	router.StrictSlash(true)
 	apiRouter := router.PathPrefix("/api").Subrouter()
+	problemsApiRouter := apiRouter.PathPrefix("/problems").Subrouter()
 
-	// Home
-	router.Handle("/", http.HandlerFunc(controllers.Home))
+	// Controllers
+	router.HandleFunc("/", controllers.Home)
+	router.HandleFunc("/problems", controllers.Problems)
+	router.HandleFunc("/problems/{problem:[A-Za-z]+}", controllers.Problem)
+	router.HandleFunc("/profile", middlewares.RequireLogged(http.HandlerFunc(controllers.Profile))).Methods("GET")
+	router.HandleFunc("/login", controllers.Login).Methods("POST")
+	router.HandleFunc("/logout", controllers.Logout).Methods("GET")
+	router.HandleFunc("/register", controllers.Register).Methods("POST")
 
-	// Problems
-	problemsRouter := router.Path("/problems").Subrouter()
-	problemsRouter.Methods("GET").HandlerFunc(controllers.Problems)
+	// Api
+	apiRouter.HandleFunc("/users", controllers.ApiUsers).Methods("GET")
+	// problemsApiRouter.HandleFunc("/", controllers.ApiProblems).Methods("GET")
 
 	// Problems Api
-	problemsApiRouter := apiRouter.PathPrefix("/problems").Subrouter()
-	problemsApiRouter.HandleFunc("/", controllers.ApiProblems)
-	handlerReverse := middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Reverse))
-	problemsApiRouter.HandleFunc("/reverse", handlerReverse)
-
-	// Profile
-	handlerProfile := middlewares.RequireLogged(http.HandlerFunc(controllers.Profile))
-	router.Path("/profile").Methods("GET").HandlerFunc(handlerProfile)
-
-	// User Api
-	usersApiRouter := apiRouter.Path("/users").Subrouter()
-	usersApiRouter.Methods("GET").HandlerFunc(controllers.ApiUsers)
-
-	// Login
-	router.Path("/login").Methods("POST").HandlerFunc(controllers.LoginPost)
-
-	// Logout
-	router.Path("/logout").Methods("GET").HandlerFunc(controllers.Logout)
-
-	// Register
-	router.Path("/register").Methods("POST").HandlerFunc(controllers.RegisterPost)
+	problemsApiRouter.HandleFunc("/reverse", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Reverse)))
+	problemsApiRouter.HandleFunc("/equation", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Equation)))
 
 	// Static assets
-	router.PathPrefix("/fonts").Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("./public/fonts/"))))
-	router.PathPrefix("/css").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./public/css/"))))
-	router.PathPrefix("/js").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("./public/js/"))))
+	router.PathPrefix("/fonts").Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("./static/fonts/"))))
+	router.PathPrefix("/css").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./static/css/"))))
+	router.PathPrefix("/js").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("./static/js/"))))
 
 	// 404
 	router.NotFoundHandler = http.HandlerFunc(notFound)

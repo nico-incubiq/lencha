@@ -17,11 +17,11 @@ func CompileUserTemplates() {
 		"sliceBy12": func(problems []models.Problem) [][]models.Problem {
 			slices := make([][]models.Problem, 0, len(problems)/12+1)
 
-			for i := 0; i+2 < len(problems); i += 12 {
+			for i := 0; i+11 < len(problems); i += 12 {
 				slice := make([]models.Problem, 12)
-				slice[0] = problems[i]
-				slice[1] = problems[i+1]
-				slice[2] = problems[i+2]
+				for j := i; j < i+12; j++ {
+					slice[j] = problems[i+j]
+				}
 				slices = append(slices, slice)
 			}
 
@@ -45,6 +45,9 @@ func ApiUsers(w http.ResponseWriter, r *http.Request) {
 		log.WithFields(log.Fields{
 			"error": err.Error(),
 		}).Warn("Database error")
+
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	JSONResponse(w, users, http.StatusOK)
@@ -61,6 +64,10 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	problemsSolved, err := user.GetSolvedProblems()
 	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Warn("Database error")
+
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -73,6 +80,8 @@ func Profile(w http.ResponseWriter, r *http.Request) {
 
 	err = usersTemplates.ExecuteTemplate(w, "profile.html", params)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.WithFields(log.Fields{
+			"error": err.Error(),
+		}).Warn("Template Error")
 	}
 }

@@ -21,7 +21,7 @@ const (
 	StatusInProgress = "in progress"
 	StatusLate       = "toolate"
 	StatusFailed     = "failed"
-	StatusSucess     = "success"
+	StatusSuccess    = "success"
 
 	StatusSuccessMessage = "Challenge Done! Congratulations. We updated your profile."
 	StatusLateMessage    = "Too late ! Try to be faster! Wait a few seconds before trying again."
@@ -29,10 +29,10 @@ const (
 )
 
 type Problem struct {
+	Id                  int           `json:"id"`
 	Name                string        `json:"name"`
 	SolvingTime         time.Duration `json:"solvingTime"`
 	DurationBeforeRetry time.Duration `json:"secondsBeforeRetry"`
-	Data                interface{}
 	InProgressHandler   InProgressHandler
 	StartingHandler     StartingHandler
 }
@@ -60,6 +60,11 @@ func (problem Problem) GetState(user models.User) (*ProblemState, error) {
 	redisC := models.RedisPool.Get()
 	defer redisC.Close()
 
+	log.WithFields(log.Fields{
+		"user_id":      user.Id,
+		"problem_name": problem.Name,
+	}).Info("Getting state in Redis")
+
 	stateBytes, err := redis.Bytes(redisC.Do("GET", problem.GetKeyForUser(user)))
 	if err == redis.ErrNil {
 		return &ProblemState{Status: StatusStarting, StartedAt: time.Now(), EndingAt: time.Now().Add(problem.SolvingTime)}, nil
@@ -84,9 +89,13 @@ func (problem Problem) SetState(user models.User, state *ProblemState) error {
 	redisC := models.RedisPool.Get()
 	defer redisC.Close()
 
+	log.WithFields(log.Fields{
+		"user_id":      user.Id,
+		"problem_name": problem.Name,
+	}).Info("Setting state in Redis")
+
 	mCache := new(bytes.Buffer)
 	encCache := gob.NewEncoder(mCache)
-	gob.Register(problem.Data)
 	err := encCache.Encode(state)
 	if err != nil {
 		return err
@@ -98,7 +107,7 @@ func (problem Problem) SetState(user models.User, state *ProblemState) error {
 }
 
 func (problem Problem) GetKeyForUser(user models.User) string {
-	return problem.Name + ":" + strconv.Itoa(user.Id)
+	return "problems:" + problem.Name + ":" + strconv.Itoa(user.Id)
 }
 
 func (problem Problem) GetExpirationForKey(state *ProblemState) int {
@@ -136,16 +145,44 @@ func HandlerFromStateHandler(problem Problem) http.Handler {
 			if state.EndingAt.Before(time.Now()) {
 				state.Status = StatusLate
 			} else {
+				prevStatus := state.Status
 				message, err = problem.InProgressHandler(r, state)
 				if err != nil {
 					state.Status = StatusFailed
+				}
+
+				// If user just succeeded update profile
+				if prevStatus != StatusSuccess && state.Status == StatusSuccess {
+					err = user.SaveSuccessProblem(problem.Id)
+					if err != nil {
+						log.WithFields(log.Fields{
+							"error": err,
+						}).Warn("Database Error")
+						http.Error(w, "Database error", http.StatusInternalServerError)
+						return
+					}
+
+					err = user.SetActivated()
+					if err != nil {
+						log.WithFields(log.Fields{
+							"error": err,
+						}).Warn("Database Error")
+						http.Error(w, "Database error", http.StatusInternalServerError)
+						return
+					}
+
+					log.WithFields(log.Fields{
+						"problem": problem.Name,
+						"user_id": user.Id,
+					}).Info("Problem Succeeded")
+
 				}
 			}
 		}
 
 		if message == nil {
 			switch state.Status {
-			case StatusSucess:
+			case StatusSuccess:
 				message = StatusSuccessMessage
 			case StatusFailed:
 				message = StatusFailedMessage

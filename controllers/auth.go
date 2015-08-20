@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/claisne/lencha/middlewares"
 	"github.com/claisne/lencha/models"
+	"github.com/claisne/lencha/session"
 	"github.com/claisne/lencha/utils"
 
 	"github.com/lib/pq"
@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func LoginPost(w http.ResponseWriter, r *http.Request) {
+func Login(w http.ResponseWriter, r *http.Request) {
 	username, password := r.FormValue("username"), r.FormValue("password")
 
 	user, err := models.GetUserByUsername(username)
@@ -30,12 +30,12 @@ func LoginPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	middlewares.SetUserIdInSession(w, r, user.Id)
+	session.SetUserId(w, r, user.Id)
 	JSONResponse(w, models.Response{Success: true}, http.StatusOK)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request) {
-	middlewares.DeleteSession(w, r)
+	session.Delete(w, r)
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -45,7 +45,7 @@ func GenerateApiKey() string {
 	return fmt.Sprintf("%x", k)
 }
 
-func RegisterPost(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request) {
 	username := r.FormValue("username")
 	password := r.FormValue("password")
 	email := r.FormValue("email")

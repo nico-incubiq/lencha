@@ -105,7 +105,6 @@
         },
 
         render: function () {
-
             var loginBtn;
             if(!this.state.isLoging) {
                 loginBtn = <button className="btn-signin btn btn-primary btn-block" type="submit">Sign in</button>;

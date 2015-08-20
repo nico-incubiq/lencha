@@ -24,7 +24,6 @@
             <ul class="nav-link-list">
                 <li class="nav-link"><a href="#">News</a></li>
                 <li class="nav-link"><a href="/problems">Challenges</a></li>
-                <li class="nav-link"><a href="#">Scoreboard</a></li>
             </ul>
           </div>
           <div class="nav-right-container">
@@ -40,23 +39,20 @@
         </header>
 {{end}}
 
+
+{{define "commonJs"}}
+<script src="/js/vendor/react/react.min.js"></script>
+<script src="/js/vendor/react-modal.js"></script>
+<script src="/js/vendor/superagent.js"></script>
+{{end}}
+
 {{define "footer"}}
-        <div id="auth-modal"></div>
+<div id="auth-modal"></div>
 
-        <!-- <footer class="footer"> -->
-        <!--     <p>Designed and built with all the love in the world by @claisne</p> -->
-        <!-- </footer> -->
-
-        <!-- React -->
-        <script src="https://fb.me/JSXTransformer-0.13.3.js"></script>
-        <script src="https://fb.me/react-0.13.3.js"></script>
-        <script src="/js/vendor/react-modal.js"></script>
-        <script src="/js/vendor/superagent.js"></script>
-
-        {{if .IsLogged}}
-        {{else}}
-        <script type="text/jsx" src="/js/auth-modal.jsx"></script>
-        {{end}}
+{{if .IsLogged}}
+{{else}}
+<script src="/js/auth-modal.js"></script>
+{{end}}
 
         <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
         <!-- <script> -->
