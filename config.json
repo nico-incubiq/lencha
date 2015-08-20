@@ -1,6 +1,6 @@
 {
   "development": {
-    "host": "localhost:8080",
+    "host": ":8080",
     "db": {
       "driver":   "postgres",
       "user":     "cl3m",
@@ -13,7 +13,7 @@
     }
   },
   "production": {
-    "host": "178.62.194.207:80",
+    "host": ":80",
     "db": {
       "driver":   "postgres",
       "user":     "lencha",

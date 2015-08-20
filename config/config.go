@@ -54,5 +54,10 @@ func Load() {
 		Conf.Production = false
 	}
 
+	// Override host if port is set in environment
+	if envPort := os.Getenv("PORT"); len(envPort) > 0 {
+		Conf.Host = ":" + envPort
+	}
+
 	log.Info("Config file read")
 }
