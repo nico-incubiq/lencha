@@ -23,5 +23,8 @@ func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
 	log.WithFields(log.Fields{"host": config.Conf.Host}).Info("Starting server")
-	http.ListenAndServe(config.Conf.Host, GenerateHandlers())
+	err := http.ListenAndServe(config.Conf.Host, GenerateHandlers())
+	if err!= nil {
+		log.WithFields(log.Fields{"error": err.Error()}).Warn("Error starting server")
+	}
 }

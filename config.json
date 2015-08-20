@@ -13,7 +13,7 @@
     }
   },
   "production": {
-    "host": "localhost:80",
+    "host": "178.62.194.207:80",
     "db": {
       "driver":   "postgres",
       "user":     "lencha",
