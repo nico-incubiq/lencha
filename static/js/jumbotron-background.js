@@ -1,5 +1,53 @@
 
 (function() {
+
+    var delayTransition = 5 * 1000;
+
+    function genConstData(length) {
+        var data = [];
+        for(var x = 0; x < length; x++) {
+            data[x] = 0.5;
+        }
+        return data;
+    }
+
+    function genCosWaveData(length) {
+        var data = [];
+        for(var x = 0; x < length; x++) {
+            data[x] = (Math.cos((x / length) * 2 * Math.PI) + 1) / 2;
+        }
+        return data;
+    }
+
+    function genSinWaveData(length) {
+        var data = [];
+        for(var x = 0; x < length; x++) {
+            data[x] = (Math.sin((x / length) * 2 * Math.PI) + 1) / 2;
+        }
+        return data;
+    }
+
+    function updateJumbotronBackground(data, cb) {
+        var bars = svg.selectAll('.sort-bar');
+        var barsUpdate = bars.data(data);
+        var barsEnter  = barsUpdate.enter();
+        var barsExit   = barsUpdate.exit();
+
+        barsUpdate.transition().duration(delayTransition)
+            .attr('class', 'sort-bar update')
+            .attr('data', function(d) { return d; })
+            .attr('y1', function(d) { return height; })
+            .attr('y2', function(d) { return height - height * d; });
+
+        barsEnter.append('svg:line')
+            .attr('class', 'sort-bar')
+            .attr('data', function(d) { return d; })
+            .attr('x1', function(d, i) { return (i / data.length) * width; })
+            .attr('x2', function(d, i) { return (i / data.length) * width; })
+            .attr('y1', function(d) { return height; })
+            .attr('y2', function(d) { return height - height * d; });
+    }
+
     var jumbotron = d3.select('#js-jumbotron');
     var svg = d3.select('#js-jumbotron-svg-background');
 
@@ -10,19 +58,24 @@
     var width  = svg.node().getBoundingClientRect().width;
     var height = svg.node().getBoundingClientRect().height;
 
-    console.log('Svg width: ' + width + ' height: '+ height);
+    console.log('svg width: ' + width + ' height: '+ height);
 
-    // Sort algorithm
-    var data = _.shuffle(_.range(100));
+    var numberOfBars = Math.floor(width / 5.0);
 
-    var bars = svg.selectAll('.sort-bar');
-    var barsUpdate = bars.data(data);
-    var barsEnter  = barsUpdate.enter();
+    var generators = [genCosWaveData, genConstData, genSinWaveData];
 
-    barsEnter.append('svg:line')
-        .attr('class', 'sort-bar')
-        .attr('x1', function(d, i) { return width * (data.length - i) / data.length; })
-        .attr('y1', function(d) { return height; })
-        .attr('x2', function(d, i) { return width * (data.length - i) / data.length; })
-        .attr('y2', function(d) { return height - height * (data.length - d) / data.length; });
+    var curGen = 0;
+    function loop() {
+        data = generators[curGen](numberOfBars);
+        updateJumbotronBackground(data);
+        curGen = (curGen + 1) % generators.length;
+
+        setTimeout(function() {
+            loop();
+        }, 6000);
+    }
+
+    updateJumbotronBackground(genCosWaveData(numberOfBars));
+    curGen = (curGen + 1) % generators.length;
+    setTimeout(loop, 1000);
 })();
