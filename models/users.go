@@ -9,13 +9,13 @@ import (
 type User struct {
 	Id             int       `json:"id"`
 	Username       string    `json:"username"`
-	Hash           string    `json:"hash"`
-	Email          string    `json:"email"`
-	ApiKey         string    `json:"api_key" db:"api_key"`
+	Hash           string    `json:"-"`
+	Email          string    `json:"-"`
+	ApiKey         string    `json:"-" db:"api_key"`
 	ProblemsSolved int       `json:"problems_solved" db:"problems_solved"`
 	Privilege      int       `json:"privilege"`
 	Activated      bool      `json:"activated"`
-	EmailUpdate    bool      `json:"activated" db:"email_update"`
+	EmailUpdate    bool      `json:"-" db:"email_update"`
 	CreatedAt      time.Time `json:"created_at" db:"created_at"`
 }
 
