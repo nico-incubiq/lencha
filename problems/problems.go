@@ -17,11 +17,12 @@ import (
 )
 
 const (
-	StatusStarting   = "starting"
-	StatusInProgress = "in progress"
-	StatusLate       = "toolate"
-	StatusFailed     = "failed"
-	StatusSuccess    = "success"
+	DefaultTimeBeforeRetry = 10 * time.Second
+	StatusStarting         = "starting"
+	StatusInProgress       = "in progress"
+	StatusLate             = "toolate"
+	StatusFailed           = "failed"
+	StatusSuccess          = "success"
 
 	StatusSuccessMessage = "Challenge Done! Congratulations. We updated your profile."
 	StatusLateMessage    = "Too late ! Try to be faster! Wait a few seconds before trying again."

@@ -12,8 +12,8 @@ import (
 var Reverse = Problem{
 	Id:                  1,
 	Name:                "reverse",
-	SolvingTime:         30 * time.Second,
-	DurationBeforeRetry: 30 * time.Second,
+	SolvingTime:         5 * time.Second,
+	DurationBeforeRetry: DefaultTimeBeforeRetry,
 	InProgressHandler:   ReverseInProgressHandler,
 	StartingHandler:     ReverseStartingHandler,
 }

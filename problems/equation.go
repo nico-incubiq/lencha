@@ -15,8 +15,8 @@ import (
 var Equation = Problem{
 	Id:                  2,
 	Name:                "equation",
-	SolvingTime:         30 * time.Second,
-	DurationBeforeRetry: 30 * time.Second,
+	SolvingTime:         3 * time.Second,
+	DurationBeforeRetry: DefaultTimeBeforeRetry,
 	InProgressHandler:   EquationInProgressHandler,
 	StartingHandler:     EquationStartingHandler,
 }

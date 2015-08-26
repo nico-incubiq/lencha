@@ -1,7 +1,7 @@
 
 (function() {
 
-    var delayTransition = 5 * 1000;
+    var delayTransition = 3 * 1000;
 
     function genConstData(length) {
         var data = [];
@@ -11,20 +11,14 @@
         return data;
     }
 
-    function genCosWaveData(length) {
-        var data = [];
-        for(var x = 0; x < length; x++) {
-            data[x] = (Math.cos((x / length) * 2 * Math.PI) + 1) / 2;
-        }
-        return data;
-    }
-
-    function genSinWaveData(length) {
-        var data = [];
-        for(var x = 0; x < length; x++) {
-            data[x] = (Math.sin((x / length) * 2 * Math.PI) + 1) / 2;
-        }
-        return data;
+    function genWaveData(dec) {
+        return function(length) {
+            var data = [];
+            for(var x = 0; x < length; x++) {
+                data[x] = (Math.sin((x / length) * 2 * Math.PI + dec) + 1) / 2;
+            }
+            return data;
+        };
     }
 
     function updateJumbotronBackground(data, cb) {
@@ -62,7 +56,7 @@
 
     var numberOfBars = Math.floor(width / 5.0);
 
-    var generators = [genCosWaveData, genConstData, genSinWaveData];
+    var generators = [genWaveData(0), genWaveData(Math.PI / 2), genWaveData(Math.PI)];
 
     var curGen = 0;
     function loop() {
@@ -72,10 +66,10 @@
 
         setTimeout(function() {
             loop();
-        }, 6000);
+        }, delayTransition + 500);
     }
 
-    updateJumbotronBackground(genCosWaveData(numberOfBars));
+    updateJumbotronBackground(genWaveData(0)(numberOfBars));
     curGen = (curGen + 1) % generators.length;
-    setTimeout(loop, 1000);
+    setTimeout(loop, 500);
 })();

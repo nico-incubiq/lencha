@@ -10,6 +10,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+// Returns the handlers from CreateRoutes,
+// augmented with some middlewares
 func GenerateHandlers() http.Handler {
 	var handlers http.Handler
 
@@ -20,6 +22,8 @@ func GenerateHandlers() http.Handler {
 	return handlers
 }
 
+// Returns all the hanlders, attached to their
+// respectives routes
 func CreateRoutes() http.Handler {
 	// Router definition
 	router := mux.NewRouter()
@@ -43,6 +47,7 @@ func CreateRoutes() http.Handler {
 	// Problems Api
 	problemsApiRouter.HandleFunc("/reverse", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Reverse)))
 	problemsApiRouter.HandleFunc("/equation", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Equation)))
+	problemsApiRouter.HandleFunc("/maze", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Maze)))
 
 	// Static assets
 	router.PathPrefix("/fonts").Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("./static/fonts/"))))

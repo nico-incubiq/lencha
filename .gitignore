@@ -1,6 +1,8 @@
 lencha
 static/js/.module-cache
 
+problems/*_test.go
+
 #### MAC ####
 .DS_Store
 .AppleDouble
