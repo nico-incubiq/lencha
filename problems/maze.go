@@ -57,7 +57,7 @@ func init() {
 }
 
 func MazeStartingHandler(state *ProblemState) (interface{}, error) {
-	maze := NewMaze(50, 200)
+	maze := NewMaze(50, 120)
 	maze.GenExplo()
 	state.Data = maze
 	state.Status = StatusInProgress
