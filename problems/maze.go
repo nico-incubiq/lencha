@@ -48,8 +48,9 @@ type MazeData struct {
 }
 
 type MazeMesage struct {
-	Height, Width int
-	Maze          []string
+	Height int      `json:"width"`
+	Width  int      `json:"height"`
+	Maze   []string `json:"maze"`
 }
 
 func init() {
