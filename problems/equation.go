@@ -22,7 +22,7 @@ var Equation = Problem{
 }
 
 const (
-	randRange       = 1000
+	randRange       = 100
 	equationEpsilon = 0.0001
 )
 

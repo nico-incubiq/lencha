@@ -206,11 +206,12 @@ p {
 
 .subtitle a {
     color: black;
-    margin-right: 10px
+    text-decoration: none;
+    margin-right: 5px;
+    margin-right: 5px;
 }
 
 .subtitle a:hover {
-    color: #337ab7;
     text-decoration: none;
 }
 
@@ -241,13 +242,14 @@ a.selected {
 
 .code-example {
     border: 1px solid #CCCCCC;
-    padding: 10px;
-    max-width: 900px;
+    padding: 20px;
+    max-width: 950px;
     margin: auto;
     margin-top: 25px;
+    display: none;
 }
 
-.footer-seperation {
+.footer-separation {
     margin-bottom: 15px;
 }
 
@@ -316,6 +318,11 @@ svg .sort-bar {
 .profile-challenge-list .content {
     padding: 10px;
     text-align: center;
+}
+
+.profile-challenge-link, .profile-challenge-link:hover {
+    color: black;
+    text-decoration: none;
 }
 
 /*========CHALLENGES========*/
@@ -439,6 +446,13 @@ svg .sort-bar {
     color: #3c763d;
     background-color: #dff0d8;
     border-color: #d6e9c6;
+}
+
+/*========PROBLEMS========*/
+
+.maze-table td {
+    width: 15px;
+    text-align: center;
 }
 
 

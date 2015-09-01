@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"math/rand"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -17,6 +16,19 @@ var Maze = Problem{
 	DurationBeforeRetry: DefaultTimeBeforeRetry,
 	InProgressHandler:   MazeInProgressHandler,
 	StartingHandler:     MazeStartingHandler,
+}
+
+type MazeData struct {
+	Height, Width int
+	Prof          int
+	SolX, SolY    int
+	Data          [][]byte
+}
+
+type MazeMesage struct {
+	Height int      `json:"width"`
+	Width  int      `json:"height"`
+	Maze   []string `json:"maze"`
 }
 
 type MazeClientAnswer struct {
@@ -39,19 +51,6 @@ const (
 	failedChar   = "Your answer contains other charater than U D L R."
 	failedNotEnd = "Your answer does not finish on the End of the maze.."
 )
-
-type MazeData struct {
-	Height, Width int
-	Prof          int
-	SolX, SolY    int
-	Data          [][]byte
-}
-
-type MazeMesage struct {
-	Height int      `json:"width"`
-	Width  int      `json:"height"`
-	Maze   []string `json:"maze"`
-}
 
 func init() {
 	gob.Register(MazeData{})
@@ -173,7 +172,6 @@ func (m *MazeData) genExploRec(x int, y int, prof int) {
 }
 
 func (m *MazeData) Display() {
-	fmt.Println("Prof: " + strconv.Itoa(m.Prof))
 	for x := 0; x < m.Width; x++ {
 		for y := 0; y < m.Height; y++ {
 			fmt.Printf("%c", m.Data[x][y])

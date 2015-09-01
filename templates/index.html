@@ -39,12 +39,12 @@
 
 <div class="container section">
     <h2 class="title">Getting started</h2>
-    <h4 class="subtitle"><a class="selected" href="#">Javascript</a> <a href="#">Ruby</a> <a href="#">Go</a></h4>
+    <h4 id="js-language-links" class="subtitle"><a href="#">Javascript</a><a href="#">Ruby</a></h4>
     <p>Let's solve the first problem together. Your goal is to get a string from our server, and
     send its reversed version back.<br>
     Get your api key from your profile and you are ready to code (You need to be registered)</p>
-    <pre class="code-example">
-<code class="javascript">var request = require('request');
+
+<pre class="code-example"><code class="javascript">var request = require('request');
 
 var url = 'http://localhost:8080/api/problems/reverse';
 var headers = {
@@ -69,16 +69,14 @@ request({url: url, headers: headers, json: true}, function (error, response, bod
         if (error) { return console.log(err); }
         console.log(body);
     });
-});</code>
-    </pre>
+});</code></pre>
 
-    <pre class="code-example">
-        <code class="ruby">require 'HTTParty'
+<pre class="code-example"><code class="ruby">require 'HTTParty'
 
 url = 'http://178.62.194.207/api/problems/reverse'
 headers = {
     'Content-Type' => 'application/json',
-    'API-KEY' => '1d5b6006e16c6e921d2ee85fe3629af1d32c39254a5c00c666529e72be27c533'
+    'API-KEY' => ''
 }
 
 body = JSON.parse(HTTParty.get(url, {headers: headers}).body)
@@ -88,12 +86,10 @@ problem_string = body["message"]
 reversed = problem_string.reverse
 
 body = JSON.parse(HTTParty.post(url, :body => {:reversed => reversed}.to_json, :headers=> headers).body)
-puts body
-        </code>
-    </pre>
+puts body</code></pre>
 </div>
 
-<hr class="footer-seperation">
+<hr class="footer-separation">
 
 <div class="container container-footer">
     <iframe class="github-frame" src="https://ghbtns.com/github-btn.html?user=twbs&repo=bootstrap&type=star&count=true"
@@ -109,8 +105,7 @@ puts body
 
 <script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js" charset="utf-8"></script>
 <script src="/js/vendor/lodash.min.js"></script>
-<script src="/js/jumbotron-background.js"></script>
-
+<script src="/js/home.js"></script>
 
 {{template "footer" .}}
 

@@ -48,6 +48,7 @@ func CreateRoutes() http.Handler {
 	problemsApiRouter.HandleFunc("/reverse", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Reverse)))
 	problemsApiRouter.HandleFunc("/equation", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Equation)))
 	problemsApiRouter.HandleFunc("/maze", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.Maze)))
+	problemsApiRouter.HandleFunc("/tictactoe", middlewares.RequireApiKey(problems.HandlerFromStateHandler(problems.TicTacToe)))
 
 	// Static assets
 	router.PathPrefix("/fonts").Handler(http.StripPrefix("/fonts/", http.FileServer(http.Dir("./static/fonts/"))))

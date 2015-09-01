@@ -1,6 +1,6 @@
 development:
     driver: postgres
-    open: user=lencha dbname=lencha sslmode=disable
+    open: user=cl3m dbname=lencha sslmode=disable
 production:
     driver: postgres
     open: user=lencha dbname=lencha sslmode=disable

@@ -1,4 +1,5 @@
 
+// JUMBOTRON BACK GROUND
 (function() {
 
     var delayTransition = 3 * 1000;
@@ -73,3 +74,28 @@
     curGen = (curGen + 1) % generators.length;
     setTimeout(loop, 500);
 })();
+
+(function() {
+    var examples = document.getElementsByClassName('code-example');
+    var exampleLinks = document.getElementById('js-language-links').getElementsByTagName('a');
+
+    // Handle clicks
+    _.forEach(exampleLinks, function(link, i){
+        link.addEventListener('click', function(evt){
+            evt.preventDefault();
+
+            _.forEach(exampleLinks, function(link, j) {
+                link.className = i == j ? 'selected' : '';
+            });
+
+            _.forEach(examples, function(example, j) {
+                example.style.display = i == j ? 'block' : 'none';
+            });
+        });
+    });
+
+    // Active first link
+    examples[0].style.display = 'block';
+    exampleLinks[0].className = 'selected';
+})();
+
