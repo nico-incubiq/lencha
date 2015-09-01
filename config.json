@@ -3,7 +3,7 @@
     "host": ":8080",
     "db": {
       "driver":   "postgres",
-      "user":     "cl3m",
+      "user":     "nicolas",
       "name":   "lencha"
     },
     "redis": {
