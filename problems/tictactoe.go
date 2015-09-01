@@ -13,8 +13,8 @@ import (
 var TicTacToe = Problem{
 	Id:                  1,
 	Name:                "tictactoe",
-	SolvingTime:         1000 * time.Second, //8 * time.Second,
-	DurationBeforeRetry: 1000 * time.Second, //DefaultTimeBeforeRetry,
+	SolvingTime:         8 * time.Second,
+	DurationBeforeRetry: DefaultTimeBeforeRetry,
 	InProgressHandler:   TicTacToeInProgressHandler,
 	StartingHandler:     TicTacToeStartingHandler,
 }
