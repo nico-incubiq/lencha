@@ -3,69 +3,54 @@ package problems
 import (
 	"encoding/gob"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
 )
 
 var TicTacToe = Problem{
-	Id:                  1,
-	Name:                "tictactoe",
-	SolvingTime:         8 * time.Second,
-	DurationBeforeRetry: DefaultTimeBeforeRetry,
+	Id:                  5,
+	Name:                "tic tac toe",
+	SolvingTime:         1000 * time.Second,
+	DurationBeforeRetry: 1000 * time.Second,
 	InProgressHandler:   TicTacToeInProgressHandler,
 	StartingHandler:     TicTacToeStartingHandler,
 }
 
-type TicTacToeData struct {
-	Board [][]byte
-}
-
-type TicTacToeMessage struct {
-	Board []string `json:"board"`
-}
-
-func (tm *TicTacToeMessage) ToTicTacToeData() (*TicTacToeData, error) {
-	t := NewTicTacToe()
-	errorLength := errors.New("Your Board is not correctly sized.")
-
-	if len(tm.Board) != 3 {
-		return nil, errorLength
-	}
-
-	for i, str := range tm.Board {
-		if len(str) != 3 {
-			return nil, errorLength
-		}
-
-		for j, c := range str {
-			b := byte(c)
-			if b == empty || b == player1Mark || b == player2Mark {
-				t.Board[i][j] = b
-			} else {
-				return nil, errors.New("Wrong character!")
-			}
-		}
-	}
-
-	return t, nil
+type TicTacToeClientAnswer struct {
+	X int
+	Y int
 }
 
 const (
-	player1Mark         = 'X'
-	player2Mark         = 'O'
-	failedFullTTC       = "The game is over and you didn't win!"
-	failedCharTTC       = "Wrong charater in you message (Only 'X', '-', 'O') are allowed."
-	failedWrongStateTTC = "You sent a wrong state! You only have the right for a single move."
+	blank                 = '-'
+	computerPon           = 'O'
+	playerPon             = 'X'
+	messagePlayerBegins   = "You begin."
+	messagePlayerTurn     = "Your turn."
+	messageComputerBegins = "I began, your turn."
+	failedJSON            = "The Body of your request is not valid JSON or is not what we expect."
+	failedUnavailable     = "Your answer overrides a position already taken."
+	endLoose              = "You failed to beat the computer!"
+	endWin                = "You won!"
+	endTie                = "This game is a tie!"
 )
 
-type Player byte
+type Coord struct {
+	X int
+	Y int
+}
 
-type TicTacToePos struct {
-	x int
-	y int
+type TicTacToeData struct {
+	Size          int
+	ComputerBegan bool
+	Board         [][]byte
+}
+
+type TicTacToeMesage struct {
+	Size    int      `json:"size"`
+	Message string   `json:"message"`
+	Board   []string `json:"board"`
 }
 
 func init() {
@@ -73,280 +58,283 @@ func init() {
 }
 
 func TicTacToeStartingHandler(state *ProblemState) (interface{}, error) {
-	t := NewTicTacToe()
-	state.Data = t
+	board := NewTicTacToe(3)
+	message := board.PickStart()
+	state.Data = board
 	state.Status = StatusInProgress
-	return t.JSONStruct(), nil
+	return board.JSONStruct(message), nil
+}
+
+func NewTicTacToe(size int) *TicTacToeData {
+	var m TicTacToeData
+
+	m.Size = size
+	m.Board = make([][]byte, size)
+
+	for x := 0; x < size; x++ {
+		m.Board[x] = make([]byte, size)
+		for y := 0; y < size; y++ {
+			m.Board[x][y] = blank
+		}
+	}
+
+	return &m
+}
+
+func (m *TicTacToeData) PickStart() string {
+	computerBegins := rand.Intn(2)
+	if computerBegins == 1 {
+		X := rand.Intn(m.Size)
+		Y := rand.Intn(m.Size)
+
+		m.Board[X][Y] = computerPon
+		m.ComputerBegan = true
+
+		return messageComputerBegins
+	}
+
+	m.ComputerBegan = false
+
+	return messagePlayerBegins
 }
 
 func TicTacToeInProgressHandler(r *http.Request, state *ProblemState) (interface{}, error) {
 	decoder := json.NewDecoder(r.Body)
-	var answer TicTacToeMessage
+	var answer TicTacToeClientAnswer
 	err := decoder.Decode(&answer)
 	if err != nil {
-		return "The Body of your request is not valid JSON or is not what we expect.", err
+		return failedJSON, err
 	}
 
-	previousT := state.Data.(TicTacToeData)
-	responseT, err := answer.ToTicTacToeData()
-	if err != nil {
-		state.Status = StatusFailed
-		return failedCharTTC, nil
-	}
-
-	if responseT.IsPossibleNextBoard(previousT) {
-		if win, _ := responseT.HasWinner(); win {
+	board := state.Data.(TicTacToeData)
+	if message, finished := board.DoNextMove(answer.X, answer.Y); finished {
+		switch message {
+		case endWin, endTie:
 			state.Status = StatusSuccess
-			return nil, nil
-		} else if responseT.IsFull() {
+			return message, nil
+		default:
 			state.Status = StatusFailed
-			return failedFullTTC, nil
-		} else if responseT.IsFirstMove() {
-			responseT.PlayRandom()
-			state.Data = responseT
-			return responseT.JSONStruct(), nil
-		} else {
-			// Ignore error we already checked if full
-			responseT.Play()
+			return message, nil
+		}
+	} else {
+		state.Status = StatusInProgress
+		return board.JSONStruct(message), nil
+	}
+}
 
-			win, _ := responseT.HasWinner()
-			if win || responseT.IsFull() {
-				state.Status = StatusFailed
-				return failedFullTTC, nil
-			} else {
-				state.Data = responseT
-				return responseT.JSONStruct(), nil
+func (m *TicTacToeData) ToString() []string {
+	res := make([]string, m.Size)
+	for i := 0; i < m.Size; i++ {
+		res[i] = string(m.Board[i])
+	}
+	return res
+}
+
+func (m *TicTacToeData) JSONStruct(message string) TicTacToeMesage {
+	mess := TicTacToeMesage{
+		Message: message,
+		Size:    m.Size,
+		Board:   m.ToString(),
+	}
+
+	return mess
+}
+
+func (m *TicTacToeData) DoNextMove(moveX int, moveY int) (string, bool) {
+	if moveX < 0 || moveX >= m.Size || moveY < 0 || moveY >= m.Size || m.Board[moveX][moveY] != blank {
+		return failedUnavailable, true
+	}
+
+	m.Board[moveX][moveY] = playerPon
+
+	if m.CheckWins(playerPon) {
+		return endWin, true
+	} else if _, availability := m.GetAvailableMoves(); !availability {
+		return endTie, true
+	}
+
+	m.ComputerPlays()
+
+	if m.CheckWins(computerPon) {
+		return endLoose, true
+	} else if _, availability := m.GetAvailableMoves(); !availability {
+		return endTie, true
+	}
+
+	return messagePlayerTurn, false
+}
+
+func (m *TicTacToeData) CheckWins(pon byte) bool {
+	// Check rows.
+	for i := 0; i < m.Size; i++ {
+		if m.WinsRow(i, pon) {
+			return true
+		}
+	}
+	// Check lines.
+	for j := 0; j < m.Size; j++ {
+		if m.WinsColumn(j, pon) {
+			return true
+		}
+	}
+	// Check diagonal 1.
+	if m.WinsDiagonals(pon) {
+		return true
+	}
+
+	return false
+}
+
+func (m *TicTacToeData) GetAvailableMoves() ([]Coord, bool) {
+	var moves []Coord
+	availability := false
+
+	// Check possibility to move.
+	for i := 0; i < m.Size; i++ {
+		for j := 0; j < m.Size; j++ {
+			if m.Board[i][j] == blank {
+				c := Coord{X: i, Y: j}
+				moves = append(moves, c)
+				availability = true
 			}
 		}
 	}
 
-	return failedWrongStateTTC, nil
+	return moves, availability
 }
 
-func NewTicTacToe() *TicTacToeData {
-	var t TicTacToeData
+func (m *TicTacToeData) WinsRow(number int, pon byte) bool {
+	if m.Board[number][0] != pon {
+		return false
+	}
 
-	t.Board = make([][]byte, 3)
-
-	for i := 0; i < 3; i++ {
-		t.Board[i] = make([]byte, 3)
-		for j := 0; j < 3; j++ {
-			t.Board[i][j] = empty
+	for i := 1; i < m.Size; i++ {
+		if m.Board[number][i-1] != m.Board[number][i] {
+			return false
 		}
 	}
 
-	return &t
-}
-
-func (t *TicTacToeData) Display() {
-	for x := 0; x < 3; x++ {
-		for y := 0; y < 3; y++ {
-			fmt.Printf("%c", t.Board[x][y])
-		}
-		fmt.Println("")
-	}
-}
-
-func (t *TicTacToeData) IsEmpty() bool {
-	for x := 0; x < 3; x++ {
-		for y := 0; y < 3; y++ {
-			if t.Board[x][y] != empty {
-				return false
-			}
-		}
-	}
 	return true
 }
 
-func (t *TicTacToeData) IsFull() bool {
-	for x := 0; x < 3; x++ {
-		for y := 0; y < 3; y++ {
-			if t.Board[x][y] == empty {
-				return false
-			}
+func (m *TicTacToeData) WinsColumn(number int, pon byte) bool {
+	if m.Board[0][number] != pon {
+		return false
+	}
+
+	for j := 1; j < m.Size; j++ {
+		if m.Board[j-1][number] != m.Board[j][number] {
+			return false
 		}
 	}
+
 	return true
 }
 
-func (t *TicTacToeData) HasWinner() (bool, Player) {
-	// Horizontal
-	for x := 0; x < 3; x++ {
-		if t.Board[x][0] == t.Board[x][1] && t.Board[x][1] == t.Board[x][2] &&
-			t.Board[x][0] != empty {
-			return true, Player(t.Board[x][0])
+func (m *TicTacToeData) WinsDiagonals(pon byte) bool {
+	if m.Board[0][0] != pon && m.Board[0][m.Size-1] != pon {
+		return false
+	}
+
+	diagA := true
+	diagB := true
+
+	for k := 1; k < m.Size; k++ {
+		if m.Board[k-1][k-1] != m.Board[k][k] {
+			diagA = false
 		}
 	}
 
-	// Vertical
-	for y := 0; y < 3; y++ {
-		if t.Board[0][y] == t.Board[1][y] && t.Board[1][y] == t.Board[2][y] &&
-			t.Board[0][y] != empty {
-			return true, Player(t.Board[0][y])
+	for k := 1; k < m.Size; k++ {
+		if m.Board[m.Size-1-(k-1)][k-1] != m.Board[m.Size-1-k][k] {
+			diagA = false
 		}
 	}
 
-	// Diagonals
-	if t.Board[0][0] == t.Board[1][1] && t.Board[1][1] == t.Board[2][2] &&
-		t.Board[0][0] != empty {
-		return true, Player(t.Board[0][0])
-	}
-
-	if t.Board[2][0] == t.Board[1][1] && t.Board[1][1] == t.Board[0][2] &&
-		t.Board[2][0] != empty {
-		return true, Player(t.Board[2][0])
-	}
-
-	return false, Player('-')
+	return !diagA && !diagB
 }
 
-func (t *TicTacToeData) IsOver() bool {
-	win, _ := t.HasWinner()
-	return t.IsFull() || win
+func (m *TicTacToeData) ComputerPlays() {
+	_, bestMove := m.Minimax(0)
+
+	m.Board[bestMove.X][bestMove.Y] = computerPon
 }
 
-func (t *TicTacToeData) IsPossibleNextBoard(p TicTacToeData) bool {
-	newMark := false
-	for x := 0; x < 3; x++ {
-		for y := 0; y < 3; y++ {
-			if t.Board[x][y] != p.Board[x][y] {
-				if newMark == false && t.Board[x][y] == 'O' {
-					newMark = true
-				} else {
-					return false
-				}
-			}
-		}
-	}
-	return newMark
-}
+func (m *TicTacToeData) GetScore(recursion int) int {
+	max := m.Size*m.Size + 1
 
-func (t *TicTacToeData) PlayRandom() {
-
-	search := true
-	var x, y int
-
-	for search {
-		x = rand.Intn(3)
-		y = rand.Intn(3)
-		if t.Board[x][y] == empty {
-			search = false
-		}
-	}
-
-	t.Board[x][y] = player1Mark
-}
-
-func (t *TicTacToeData) score(depth int) int {
-	if win, winner := t.HasWinner(); win {
-		if winner == player1Mark {
-			return 10 - depth
-		} else {
-			return depth - 10
-		}
+	if m.CheckWins(computerPon) {
+		return max - recursion
+	} else if m.CheckWins(playerPon) {
+		return recursion - max
 	} else {
 		return 0
 	}
 }
 
-func (t *TicTacToeData) EmptyPositions() []TicTacToePos {
-	positions := make([]TicTacToePos, 0, 9)
+func (m *TicTacToeData) GetPossibleGame(move Coord, pon byte) TicTacToeData {
+	var possibleGame TicTacToeData
+	possibleGame.Size = m.Size
+	possibleGame.ComputerBegan = m.ComputerBegan
+	possibleGame.Board = make([][]byte, m.Size)
+	copy(possibleGame.Board, m.Board)
 
-	for x := 0; x < 3; x++ {
-		for y := 0; y < 3; y++ {
-			if t.Board[x][y] == empty {
-				positions = append(positions, TicTacToePos{x: x, y: y})
-			}
+	possibleGame.Board[move.X][move.Y] = pon
+
+	return possibleGame
+}
+
+func GetMaxValueIndex(a []int) int {
+	index := 0
+	for i, value := range a {
+		if value > a[index] {
+			index = i
 		}
 	}
 
-	return positions
+	return index
 }
 
-func oppositeMark(mark byte) byte {
-	if mark == player1Mark {
-		return player2Mark
+func GetMinValueIndex(a []int) int {
+	index := 0
+	for i, value := range a {
+		if value < a[index] {
+			index = i
+		}
+	}
+
+	return index
+}
+
+func (m *TicTacToeData) Minimax(recursion int) (int, Coord) {
+	availableMoves, availability := m.GetAvailableMoves()
+	if !availability {
+		return m.GetScore(recursion), Coord{-1, -1}
+	}
+
+	var scores []int
+	var moves []Coord
+
+	var possibleGame TicTacToeData
+	for _, coord := range availableMoves {
+		if recursion%2 == 0 {
+			possibleGame = m.GetPossibleGame(coord, computerPon)
+		} else {
+			possibleGame = m.GetPossibleGame(coord, playerPon)
+		}
+
+		index, _ := possibleGame.Minimax(recursion + 1)
+		scores = append(scores, index)
+		moves = append(moves, coord)
+	}
+
+	if recursion%2 == 0 {
+		// It is the computer turn.
+		maxIndex := GetMaxValueIndex(scores)
+		return scores[maxIndex], moves[maxIndex]
 	} else {
-		return player1Mark
+		// It is the player turn.
+		minIndex := GetMinValueIndex(scores)
+		return scores[minIndex], moves[minIndex]
 	}
-}
-
-func (t *TicTacToeData) Play() (*TicTacToePos, error) {
-	pos, err := t.negamaxWithPos(1)
-	t.Board[pos.x][pos.y] = player1Mark
-	return pos, err
-}
-
-// color: 1 player1 -1 player2
-func (t *TicTacToeData) negamaxWithPos(color int) (*TicTacToePos, error) {
-	if t.IsOver() {
-		return nil, errors.New("Game already over.")
-	}
-
-	bestValue := -10
-	bestPosition := TicTacToePos{x: -1, y: -1}
-
-	for _, emptyPos := range t.EmptyPositions() {
-		t.Board[emptyPos.x][emptyPos.y] = t.getMark(color)
-		val := -t.negamax(-color, 0)
-		if val >= bestValue {
-			bestValue = val
-			bestPosition = emptyPos
-		}
-		t.Board[emptyPos.x][emptyPos.y] = empty
-	}
-
-	return &bestPosition, nil
-}
-
-func (t *TicTacToeData) getMark(color int) byte {
-	if color == 1 {
-		return player1Mark
-	} else {
-		return player2Mark
-	}
-}
-
-func (t *TicTacToeData) negamax(color int, depth int) int {
-	if t.IsOver() {
-		return color * t.score(depth)
-	}
-
-	bestValue := -10
-
-	for _, emptyPos := range t.EmptyPositions() {
-		t.Board[emptyPos.x][emptyPos.y] = t.getMark(color)
-		val := -t.negamax(-color, depth+1)
-		if val >= bestValue {
-			bestValue = val
-		}
-		t.Board[emptyPos.x][emptyPos.y] = empty
-	}
-
-	return bestValue
-}
-
-func (t *TicTacToeData) NumberEmptyCases() int {
-	res := 0
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			if t.Board[i][j] == empty {
-				res += 1
-			}
-		}
-	}
-	return res
-}
-
-func (t *TicTacToeData) IsFirstMove() bool {
-	return t.NumberEmptyCases() == 8
-}
-
-func (t *TicTacToeData) JSONStruct() (mess TicTacToeMessage) {
-	mess.Board = make([]string, 3)
-	for i := 0; i < 3; i++ {
-		mess.Board[i] = string(t.Board[i])
-	}
-
-	return mess
 }
