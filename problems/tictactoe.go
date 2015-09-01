@@ -111,10 +111,10 @@ func TicTacToeInProgressHandler(r *http.Request, state *ProblemState) (interface
 		switch message {
 		case endWin, endTie:
 			state.Status = StatusSuccess
-			return message, nil
+			return board.JSONStruct(message), nil
 		default:
 			state.Status = StatusFailed
-			return message, nil
+			return board.JSONStruct(message), nil
 		}
 	} else {
 		state.Status = StatusInProgress
@@ -204,12 +204,8 @@ func (m *TicTacToeData) GetAvailableMoves() ([]Coord, bool) {
 }
 
 func (m *TicTacToeData) WinsRow(number int, pon byte) bool {
-	if m.Board[number][0] != pon {
-		return false
-	}
-
-	for i := 1; i < m.Size; i++ {
-		if m.Board[number][i-1] != m.Board[number][i] {
+	for i := 0; i < m.Size; i++ {
+		if m.Board[number][i] != pon {
 			return false
 		}
 	}
@@ -218,12 +214,8 @@ func (m *TicTacToeData) WinsRow(number int, pon byte) bool {
 }
 
 func (m *TicTacToeData) WinsColumn(number int, pon byte) bool {
-	if m.Board[0][number] != pon {
-		return false
-	}
-
-	for j := 1; j < m.Size; j++ {
-		if m.Board[j-1][number] != m.Board[j][number] {
+	for j := 0; j < m.Size; j++ {
+		if m.Board[j][number] != pon {
 			return false
 		}
 	}
@@ -232,26 +224,22 @@ func (m *TicTacToeData) WinsColumn(number int, pon byte) bool {
 }
 
 func (m *TicTacToeData) WinsDiagonals(pon byte) bool {
-	if m.Board[0][0] != pon && m.Board[0][m.Size-1] != pon {
-		return false
-	}
-
 	diagA := true
 	diagB := true
 
-	for k := 1; k < m.Size; k++ {
-		if m.Board[k-1][k-1] != m.Board[k][k] {
+	for k := 0; k < m.Size; k++ {
+		if m.Board[k][k] != pon {
 			diagA = false
 		}
 	}
 
-	for k := 1; k < m.Size; k++ {
-		if m.Board[m.Size-1-(k-1)][k-1] != m.Board[m.Size-1-k][k] {
-			diagA = false
+	for k := 0; k < m.Size; k++ {
+		if m.Board[(m.Size-1)-k][k] != pon {
+			diagB = false
 		}
 	}
 
-	return !diagA && !diagB
+	return diagA || diagB
 }
 
 func (m *TicTacToeData) ComputerPlays() {
@@ -272,12 +260,16 @@ func (m *TicTacToeData) GetScore(recursion int) int {
 	}
 }
 
-func (m *TicTacToeData) GetPossibleGame(move Coord, pon byte) TicTacToeData {
-	var possibleGame TicTacToeData
-	possibleGame.Size = m.Size
+func (m *TicTacToeData) GetPossibleGame(move Coord, pon byte) *TicTacToeData {
+	possibleGame := NewTicTacToe(m.Size)
+
 	possibleGame.ComputerBegan = m.ComputerBegan
-	possibleGame.Board = make([][]byte, m.Size)
-	copy(possibleGame.Board, m.Board)
+
+	for i := 0; i < m.Size; i++ {
+		for j := 0; j < m.Size; j++ {
+			possibleGame.Board[i][j] = m.Board[i][j]
+		}
+	}
 
 	possibleGame.Board[move.X][move.Y] = pon
 
@@ -308,23 +300,26 @@ func GetMinValueIndex(a []int) int {
 
 func (m *TicTacToeData) Minimax(recursion int) (int, Coord) {
 	availableMoves, availability := m.GetAvailableMoves()
-	if !availability {
+	switch {
+	case !availability, recursion%2 == 1 && m.CheckWins(computerPon), recursion%2 == 0 && m.CheckWins(playerPon):
+		// No more move, computer won, or player won.
 		return m.GetScore(recursion), Coord{-1, -1}
 	}
 
 	var scores []int
 	var moves []Coord
 
-	var possibleGame TicTacToeData
 	for _, coord := range availableMoves {
+		var possibleGame *TicTacToeData
+
 		if recursion%2 == 0 {
 			possibleGame = m.GetPossibleGame(coord, computerPon)
 		} else {
 			possibleGame = m.GetPossibleGame(coord, playerPon)
 		}
 
-		index, _ := possibleGame.Minimax(recursion + 1)
-		scores = append(scores, index)
+		score, _ := possibleGame.Minimax(recursion + 1)
+		scores = append(scores, score)
 		moves = append(moves, coord)
 	}
 
