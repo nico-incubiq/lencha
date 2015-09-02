@@ -11,8 +11,8 @@ import (
 var TicTacToe = Problem{
 	Id:                  5,
 	Name:                "tic tac toe",
-	SolvingTime:         1000 * time.Second,
-	DurationBeforeRetry: 1000 * time.Second,
+	SolvingTime:         10 * time.Second,
+	DurationBeforeRetry: 10 * time.Second,
 	InProgressHandler:   TicTacToeInProgressHandler,
 	StartingHandler:     TicTacToeStartingHandler,
 }
